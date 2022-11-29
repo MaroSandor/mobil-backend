@@ -15,7 +15,7 @@ const connection = mysql.createConnection({
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res) =>  {
+app.get('/', (req, res) => {
     res.send('Saját alkalmazás backend szerver oldal')
 })
 
@@ -39,11 +39,27 @@ app.get('/jaratok', (req, res) => {
 
     connection.connect()
 
-    connection.query('SELECT route_short_name FROM routes', (err, rows, fields) => {
+    connection.query('SELECT route4_short_name FROM routes', (err, rows, fields) => {
         if (err) throw err
 
         console.log('The solution is: ', rows)
         res.send(rows)
+    })
+
+    connection.end()
+})
+
+app.post('/felvitel', (req, res) => {
+    connection.connect()
+
+    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.bevitel1 + ", " + req.body.bevitel2 + ", " + req.body.bevitel3 + ", '" + req.body.bevitel4 + "')", function (err, rows, fields) {
+        if (err)
+            console.log(err)
+        else {
+            console.log("Sikeres felvitel!")
+            res.send("Sikeres felvitel!")
+        }
+
     })
 
     connection.end()
