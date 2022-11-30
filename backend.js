@@ -39,7 +39,7 @@ app.get('/jaratok', (req, res) => {
 
     connection.connect()
 
-    connection.query('SELECT route4_short_name FROM routes', (err, rows, fields) => {
+    connection.query('SELECT route_short_name FROM routes', (err, rows, fields) => {
         if (err) throw err
 
         console.log('The solution is: ', rows)
