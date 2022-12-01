@@ -5,12 +5,18 @@ const { equal } = require('assert')
 const app = express()
 const port = 24001
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'exam_db'
-})
+var connection
+
+function kapcsolat() {
+    connection = mysql.createConnection({
+        host: 'localhost',
+        user: 'root',
+        password: '',
+        database: 'exam_db'
+    })
+    connection.connect()
+}
+
 
 app.use(cors())
 app.use(express.json())
@@ -22,7 +28,7 @@ app.get('/', (req, res) => {
 // & Első backend végpont: Összes adat az 'agency' táblából
 app.get('/osszes_adat', (req, res) => {
 
-    connection.connect()
+    kapcsolat()
 
     connection.query('SELECT * FROM agency', (err, rows, fields) => {
         if (err) throw err
@@ -37,9 +43,9 @@ app.get('/osszes_adat', (req, res) => {
 // & Második backend végpont: Járatszámok lekérdezéses a 'routes' táblából
 app.get('/jaratok', (req, res) => {
 
-    connection.connect()
+    kapcsolat()
 
-    connection.query('SELECT route_short_name FROM routes', (err, rows, fields) => {
+    connection.query('SELECT route_id, route_short_name FROM routes', (err, rows, fields) => {
         if (err) throw err
 
         console.log('The solution is: ', rows)
@@ -50,16 +56,15 @@ app.get('/jaratok', (req, res) => {
 })
 
 app.post('/felvitel', (req, res) => {
-    connection.connect()
+
+    kapcsolat()
 
     connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.bevitel1 + ", " + req.body.bevitel2 + ", " + req.body.bevitel3 + ", '" + req.body.bevitel4 + "')", function (err, rows, fields) {
         if (err)
             console.log(err)
         else {
             console.log("Sikeres felvitel!")
-            res.send("Sikeres felvitel!")
         }
-
     })
 
     connection.end()
