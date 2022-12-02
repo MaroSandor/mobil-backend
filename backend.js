@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
     res.send('Saját alkalmazás backend szerver oldal')
 })
 
-// & Első backend végpont: Összes adat az 'agency' táblából
+// # Első backend végpont: Összes adat az 'agency' táblából
 app.get('/osszes_adat', (req, res) => {
 
     kapcsolat()
@@ -40,7 +40,7 @@ app.get('/osszes_adat', (req, res) => {
     connection.end()
 })
 
-// & Második backend végpont: Járatszámok lekérdezéses a 'routes' táblából
+// # Második backend végpont: Járatszámok lekérdezéses a 'routes' táblából
 app.get('/jaratok', (req, res) => {
 
     kapcsolat()
@@ -55,6 +55,7 @@ app.get('/jaratok', (req, res) => {
     connection.end()
 })
 
+// # Harmadik végpont: Vélemény felvitele az 'opinions' táblába (a későbbi megjelenítéshez)
 app.post('/felvitel', (req, res) => {
 
     kapcsolat()
@@ -63,7 +64,23 @@ app.post('/felvitel', (req, res) => {
         if (err)
             console.log(err)
         else {
-            console.log("Sikeres felvitel!")
+            console.log("Sikeres felvitel az adatbázisba!")
+        }
+    })
+
+    connection.end()
+})
+
+// # Negyedik végpont: User adatok lekérése az adatbázisból a bejelentkezéshez
+app.get('/login', (req, res) => {
+
+    kapcsolat()
+
+    connection.query("SELECT user_name, user_password, user_privilege FROM users", function (err, rows, fields) {
+        if (err)
+            console.log(err)
+        else {
+            console.log("Sikeresen lekérve az adatbázisból!")
         }
     })
 
