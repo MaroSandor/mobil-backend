@@ -60,7 +60,7 @@ app.post('/felvitel', (req, res) => {
 
     kapcsolat()
 
-    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.bevitel1 + ", " + req.body.bevitel2 + ", " + req.body.bevitel3 + ", '" + req.body.bevitel4 + "')", function (err, rows, fields) {
+    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.jaratszam + ", " + req.body.bevitel2 + ", " + req.body.bevitel3 + ", '" + req.body.bevitel4 + "')", function (err, rows, fields) {
         if (err)
             console.log(err)
         else {
@@ -77,6 +77,22 @@ app.get('/login', (req, res) => {
     kapcsolat()
 
     connection.query("SELECT user_name, user_password, user_privilege FROM users", function (err, rows, fields) {
+        if (err)
+            console.log(err)
+        else {
+            console.log("Sikeresen lekérve az adatbázisból!")
+        }
+    })
+
+    connection.end()
+})
+
+// # Ötödik végpont: Vélemények lekérdezése az adatbázisból
+app.get('/velemenyek', (req, res) => {
+
+    kapcsolat()
+
+    connection.query('SELECT routes.route_short_name, comfort_velemeny.opinions_desc, time_velemeny.opinions_desc, crowd_velemeny.opinions_desc FROM opinions INNER JOIN routes ON routes.route_id = opinions.opinion_route INNER JOIN opinions_desc AS comfort_velemeny ON comfort_velemeny.opinions_desc_id = opinions.opinion_comfort INNER JOIN opinions_desc AS time_velemeny ON time_velemeny.opinions_desc_id = opinions.opinion_time INNER JOIN opinions_desc AS crowd_velemeny ON crowd_velemeny.opinions_desc_id = opinions.opinion_time', function (err, rows, fields) {
         if (err)
             console.log(err)
         else {
