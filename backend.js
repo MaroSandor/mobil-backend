@@ -1,7 +1,6 @@
 const express = require('express')
 const cors = require('cors')
 const mysql = require('mysql')
-const { equal } = require('assert')
 const app = express()
 const port = 24001
 
