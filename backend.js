@@ -59,7 +59,7 @@ app.post('/felvitel', (req, res) => {
 
     kapcsolat()
 
-    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.jaratszam + ", " + req.body.bevitel2 + ", " + req.body.bevitel3 + ", '" + req.body.bevitel4 + "')", function (err, rows, fields) {
+    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.jaratszam + ", " + req.body.comfort + ", " + req.body.time + ", '" + req.body.traffic + "', '" + req.body.velemeny + "')", function (err, rows, fields) {
         if (err)
             console.log(err)
         else {
