@@ -1,107 +1,125 @@
-const express = require('express')
-const cors = require('cors')
-const mysql = require('mysql')
-const app = express()
-const port = 24001
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql");
+const app = express();
+const port = 24001;
 
-var connection
+var connection;
 
 function kapcsolat() {
-    connection = mysql.createConnection({
-        host: 'localhost',
-        user: 'root',
-        password: '',
-        database: 'exam_db'
-    })
-    connection.connect()
+  connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "exam_db",
+  });
+  connection.connect();
 }
 
+app.use(cors());
+app.use(express.json());
 
-app.use(cors())
-app.use(express.json())
-
-app.get('/', (req, res) => {
-    res.send('Saját alkalmazás backend szerver oldal')
-})
+app.get("/", (req, res) => {
+  res.send("Saját alkalmazás backend szerver oldal");
+});
 
 // # Első backend végpont: Összes adat az 'agency' táblából
-app.get('/osszes_adat', (req, res) => {
+app.get("/osszes_adat", (req, res) => {
+  kapcsolat();
 
-    kapcsolat()
+  connection.query("SELECT * FROM agency", (err, rows, fields) => {
+    if (err) throw err;
 
-    connection.query('SELECT * FROM agency', (err, rows, fields) => {
-        if (err) throw err
+    console.log("The solution is: ", rows);
+    res.send(rows);
+  });
 
-        console.log('The solution is: ', rows)
-        res.send(rows)
-    })
-
-    connection.end()
-})
+  connection.end();
+});
 
 // # Második backend végpont: Járatszámok lekérdezéses a 'routes' táblából
-app.get('/jaratok', (req, res) => {
+app.get("/jaratok", (req, res) => {
+  kapcsolat();
 
-    kapcsolat()
+  connection.query(
+    "SELECT route_id, route_short_name FROM routes",
+    (err, rows, fields) => {
+      if (err) throw err;
 
-    connection.query('SELECT route_id, route_short_name FROM routes', (err, rows, fields) => {
-        if (err) throw err
+      console.log("The solution is: ", rows);
+      res.send(rows);
+    }
+  );
 
-        console.log('The solution is: ', rows)
-        res.send(rows)
-    })
-
-    connection.end()
-})
+  connection.end();
+});
 
 // # Harmadik végpont: Vélemény felvitele az 'opinions' táblába (a későbbi megjelenítéshez)
-app.post('/felvitel', (req, res) => {
+app.post("/felvitel", (req, res) => {
+  kapcsolat();
 
-    kapcsolat()
+  connection.query(
+    "INSERT INTO opinions VALUES (NULL, " +
+      req.body.jaratszam +
+      ", " +
+      req.body.comfort +
+      ", " +
+      req.body.time +
+      ", '" +
+      req.body.traffic +
+      "', '" +
+      req.body.velemeny +
+      "')",
+    function (err, rows, fields) {
+      if (err) console.log(err);
+      else {
+        console.log("Sikeres felvitel az adatbázisba!");
+      }
+    }
+  );
 
-    connection.query("INSERT INTO opinions VALUES (NULL, " + req.body.jaratszam + ", " + req.body.comfort + ", " + req.body.time + ", '" + req.body.traffic + "', '" + req.body.velemeny + "')", function (err, rows, fields) {
-        if (err)
-            console.log(err)
-        else {
-            console.log("Sikeres felvitel az adatbázisba!")
-        }
-    })
-
-    connection.end()
-})
+  connection.end();
+});
 
 // # Negyedik végpont: User adatok lekérése az adatbázisból a bejelentkezéshez
-app.get('/login', (req, res) => {
+app.get("/login", (req, res) => {
+  kapcsolat();
 
-    kapcsolat()
+  connection.query(
+    "SELECT user_name, user_password, user_privilege FROM users",
+    function (err, rows, fields) {
+      if (err) console.log(err);
+      else {
+        console.log("Sikeresen lekérve az adatbázisból!");
+      }
+    }
+  );
 
-    connection.query("SELECT user_name, user_password, user_privilege FROM users", function (err, rows, fields) {
-        if (err)
-            console.log(err)
-        else {
-            console.log("Sikeresen lekérve az adatbázisból!")
-        }
-    })
-
-    connection.end()
-})
+  connection.end();
+});
 
 // # Ötödik végpont: Vélemények lekérdezése az adatbázisból
-app.get('/velemenyek', (req, res) => {
-
-    kapcsolat()
-
-    connection.query('SELECT routes.route_short_name, comfort_velemeny.opinions_desc, time_velemeny.opinions_desc, crowd_velemeny.opinions_desc FROM opinions INNER JOIN routes ON routes.route_id = opinions.opinion_route INNER JOIN opinions_desc AS comfort_velemeny ON comfort_velemeny.opinions_desc_id = opinions.opinion_comfort INNER JOIN opinions_desc AS time_velemeny ON time_velemeny.opinions_desc_id = opinions.opinion_time INNER JOIN opinions_desc AS crowd_velemeny ON crowd_velemeny.opinions_desc_id = opinions.opinion_time', function (err, rows, fields) {
-        if (err)
-            console.log(err)
-        else {
-            console.log("Sikeresen lekérve az adatbázisból!")
-        }
-    })
-
-    connection.end()
-})
+app.get("/velemenyek", (req, res) => {
+    kapcsolat();
+  
+    connection.query(
+      `SELECT routes.route_short_name, comfort_velemeny.opinions_desc AS "comfort", time_velemeny.opinions_desc AS "time", crowd_velemeny.opinions_desc AS "crowd"
+      FROM opinions INNER JOIN routes ON routes.route_id = opinions.opinion_route INNER JOIN opinions_desc AS comfort_velemeny 
+      ON comfort_velemeny.opinions_desc_id = opinions.opinion_comfort INNER JOIN opinions_desc AS time_velemeny 
+      ON time_velemeny.opinions_desc_id = opinions.opinion_time INNER JOIN opinions_desc AS crowd_velemeny 
+      ON crowd_velemeny.opinions_desc_id = opinions.opinion_time`,
+      (err, rows, fields) => {
+        if (err) throw err;
+  
+        console.log("The solution is: ", rows);
+        res.send(rows);
+      }
+    );  
+    connection.end();
+});
 
 app.listen(port, () => {
-    console.log(`Alap backend szerver elérése: https://maro-sandor-peter.dszcbaross.tk`)
-})
+  console.log(
+    `Alap backend szerver elérése: https://maro-sandor-peter.dszcbaross.tk`
+  );
+});
