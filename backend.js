@@ -42,7 +42,7 @@ app.get("/jaratok", (req, res) => {
   kapcsolat();
 
   connection.query(
-    "SELECT route_id, route_short_name FROM routes",
+    "SELECT route_short_name FROM routes ORDER BY route_short_name ASC",
     (err, rows, fields) => {
       if (err) throw err;
 
@@ -103,7 +103,7 @@ app.get("/velemenyek", (req, res) => {
   kapcsolat();
 
   connection.query(
-    "SELECT routes.route_short_name, comfort.opinions_desc AS comfort, ido.opinions_desc AS ido, crowd.opinions_desc AS crowd, opinions.opinion_comment FROM opinions INNER JOIN routes ON routes.route_id = opinions.opinion_route INNER JOIN opinions_desc AS comfort ON comfort.opinions_desc_id = opinions.opinion_comfort INNER JOIN opinions_desc AS ido ON ido.opinions_desc_id = opinions.opinion_time INNER JOIN opinions_desc AS crowd ON crowd.opinions_desc_id = opinions.opinion_crowd;",
+    "SELECT opinion_id AS route_id, routes.route_short_name, comfort.opinions_desc AS comfort, ido.opinions_desc AS ido, crowd.opinions_desc AS crowd, opinions.opinion_comment FROM opinions INNER JOIN routes ON routes.route_id = opinions.opinion_route INNER JOIN opinions_desc AS comfort ON comfort.opinions_desc_id = opinions.opinion_comfort INNER JOIN opinions_desc AS ido ON ido.opinions_desc_id = opinions.opinion_time INNER JOIN opinions_desc AS crowd ON crowd.opinions_desc_id = opinions.opinion_crowd",
     (err, rows, fields) => {
       if (err) throw err;
 
